@@ -1,6 +1,5 @@
 package tech.buildrun.dynamodb.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.awspring.cloud.dynamodb.DynamoDbTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +9,6 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import tech.buildrun.dynamodb.entity.PlayerHistory;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/players")
@@ -36,11 +34,11 @@ public class PlayerController {
 
         var conditional = QueryConditional.keyEqualTo(key);
 
-        var playerHistory = dynamoDbTemplate.query(QueryEnhancedRequest.builder()
+        var playerHistoryList = dynamoDbTemplate.query(QueryEnhancedRequest.builder()
                         .queryConditional(conditional).build(),
                 PlayerHistory.class);
 
-        return ResponseEntity.ok(playerHistory.items().stream().toList());
+        return ResponseEntity.ok(playerHistoryList.items().stream().toList());
 
     }
 
@@ -70,6 +68,28 @@ public class PlayerController {
         }
 
         dynamoDbTemplate.delete(key, PlayerHistory.class);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{playerId}/games/{gameId}")
+    public ResponseEntity<Void> update(@PathVariable("playerId") String playerId,
+                                       @PathVariable("gameId") String gameId,
+                                       @RequestBody ScoreDto scoreDto) {
+        var key = Key.builder()
+                .partitionValue(playerId)
+                .sortValue(gameId)
+                .build();
+
+        var player = dynamoDbTemplate.load(key, PlayerHistory.class);
+
+        if (player == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        player.setScore(scoreDto.score());
+
+        dynamoDbTemplate.save(player);
 
         return ResponseEntity.noContent().build();
     }
