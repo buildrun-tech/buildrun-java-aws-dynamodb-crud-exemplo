@@ -10,7 +10,7 @@
 
 </p>
 
-Para um maior entendimento do código deste repositório, [assista nosso vídeo no Youtube, clique aqui.](https://www.youtube.com/watch?v=56_F59cIT8M)
+Para um maior entendimento do código deste repositório, [assista nosso vídeo no Youtube, clique aqui.](www.youtube.com/watch?v=qxSeffy6Nr4)
 
 ## :rocket: Tecnologias utilizadas
 
